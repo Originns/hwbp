@@ -3,21 +3,24 @@
 #include <Windows.h>
 #include "dr.h"
 
-typedef enum {
+typedef enum
+{
     INSTRUCTION_EXECUTION = 0,
     DATA_WRITEONLY = 1,
     IO_READWRITE = 2,
     DATA_READWRITE = 3
 } BP_READ_WRITE;
 
-typedef enum {
+typedef enum
+{
     ONE_BYTE = 0,
     TWO_BYTE = 1,
     EIGHT_BYTE = 2,
     FOUR_BYTE = 3
 } BP_LENGTH;
 
-typedef struct _HWBP {
+typedef struct _HWBP
+{
     LPVOID target;
     DWORD threadId;
     BP_READ_WRITE read_write;

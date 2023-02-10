@@ -20,25 +20,25 @@ void bp_destroy(PHWBP bp)
 
 static void bp_init(PHWBP bp, LPVOID lpTarget, DWORD threadId, BP_READ_WRITE read_write, BP_LENGTH length)
 {
-	bp->target = lpTarget;
-	bp->threadId = threadId;
-	bp->read_write = read_write;
-	bp->length = length;
+    bp->target = lpTarget;
+    bp->threadId = threadId;
+    bp->read_write = read_write;
+    bp->length = length;
     bp->index = -1;
     bp->enabled = FALSE;
 }
 
 static int8_t get_free_index(dr7 _dr7)
 {
-	if (!_dr7.local_breakpoint_0)
-		return 0;
+    if (!_dr7.local_breakpoint_0)
+        return 0;
     if (!_dr7.local_breakpoint_1)
         return 1;
     if (!_dr7.local_breakpoint_2)
         return 2;
     if (!_dr7.local_breakpoint_3)
         return 3;
-	return -1; // if all are used, return
+    return -1; // if all are used, return
 }
 
 static BOOL bp_add_to_ctx(PHWBP bp, PCONTEXT ctx)
@@ -48,8 +48,8 @@ static BOOL bp_add_to_ctx(PHWBP bp, PCONTEXT ctx)
 
     int8_t idx = get_free_index(_dr7);
 
-	if (idx == -1)
-		return FALSE;
+    if (idx == -1)
+        return FALSE;
 
     switch (idx)
     {
@@ -78,13 +78,13 @@ static BOOL bp_add_to_ctx(PHWBP bp, PCONTEXT ctx)
         _dr7.read_write_3 = bp->read_write;
         break;
     default:
-		return FALSE; // should never happen
+        return FALSE; // should never happen
     }
 
-	bp->index = idx;
+    bp->index = idx;
     ctx->Dr7 = _dr7.flags;
-	
-	return TRUE;
+
+    return TRUE;
 }
 
 static BOOL bp_remove_from_ctx(PHWBP bp, PCONTEXT ctx)
@@ -118,15 +118,15 @@ static BOOL bp_remove_from_ctx(PHWBP bp, PCONTEXT ctx)
         _dr7.length_3 = 0;
         _dr7.read_write_3 = 0;
         break;
-	default:
-		bp->enabled = FALSE;
+    default:
+        bp->enabled = FALSE;
         return FALSE; // ??
     }
 
-	bp->index = -1;
+    bp->index = -1;
     ctx->Dr7 = _dr7.flags;
 
-	return TRUE;
+    return TRUE;
 }
 
 BOOL bp_enable(PHWBP bp)
@@ -142,7 +142,7 @@ BOOL bp_enable(PHWBP bp)
         return FALSE;
     }
 
-    CONTEXT ctx = { 0 };
+    CONTEXT ctx = {0};
     ctx.ContextFlags = CONTEXT_DEBUG_REGISTERS;
 
     if (!GetThreadContext(hThread, &ctx))
@@ -151,13 +151,13 @@ BOOL bp_enable(PHWBP bp)
         CloseHandle(hThread);
         return FALSE;
     }
-    
+
     if (!bp_add_to_ctx(bp, &ctx))
-	{
-		ResumeThread(hThread);
-		CloseHandle(hThread);
-		return FALSE;
-	}
+    {
+        ResumeThread(hThread);
+        CloseHandle(hThread);
+        return FALSE;
+    }
 
     if (!SetThreadContext(hThread, &ctx))
     {
@@ -187,7 +187,7 @@ BOOL bp_disable(PHWBP bp)
         return FALSE;
     }
 
-    CONTEXT ctx = { 0 };
+    CONTEXT ctx = {0};
     ctx.ContextFlags = CONTEXT_DEBUG_REGISTERS;
 
     if (!GetThreadContext(hThread, &ctx))
@@ -198,11 +198,11 @@ BOOL bp_disable(PHWBP bp)
     }
 
     if (!bp_remove_from_ctx(bp, &ctx))
-	{
-		ResumeThread(hThread);
-		CloseHandle(hThread);
-		return FALSE;
-	}
+    {
+        ResumeThread(hThread);
+        CloseHandle(hThread);
+        return FALSE;
+    }
 
     if (!SetThreadContext(hThread, &ctx))
     {
